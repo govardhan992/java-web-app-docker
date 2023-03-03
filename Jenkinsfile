@@ -24,7 +24,7 @@ pipeline {
                     }
             }
         }
-       /* stage("Quality Gate") {
+        stage("Quality Gate") {
             steps {
                 timeout(time: 4, unit: 'MINUTES') {
                     // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
@@ -32,7 +32,7 @@ pipeline {
                     waitForQualityGate abortPipeline: true
                 }
             }
-        } */
+        } 
         stage('build the docker image'){
             steps {
                 sh "docker build -t govardhanr992/java-web:${BUILD_NUMBER} ."
