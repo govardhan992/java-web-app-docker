@@ -18,9 +18,9 @@ pipeline {
             steps{
                    withSonarQubeEnv('sonarqubeserver') {
                         sh 'mvn clean verify sonar:sonar \
-                        -Dsonar.projectKey=maven-project \
+                        -Dsonar.projectKey=java-maven-project \
                         -Dsonar.host.url=http://3.14.248.244:9000 \
-                        -Dsonar.login=jenkins'
+                        -Dsonar.login=f0f4111502e20e4bc0d9fb8a83777d9c54fc1333'
                     }
             }
         }
