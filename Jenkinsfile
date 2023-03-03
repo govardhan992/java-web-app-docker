@@ -16,11 +16,11 @@ pipeline {
         }
         stage('SonarQube Analysis'){
             steps{
-                   withSonarQubeEnv('Sonarqubeserver') {
+                   withSonarQubeEnv('sonarqubeserver') {
                         sh 'mvn clean verify sonar:sonar \
                         -Dsonar.projectKey=maven-project \
                         -Dsonar.host.url=http://3.14.248.244:9000 \
-                        -Dsonar.login=af8a2ecfe3ba8a7ccc6a500e938921767e93c68d'
+                        -Dsonar.login=jenkins'
                     }
             }
         }
