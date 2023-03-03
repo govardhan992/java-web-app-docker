@@ -1,40 +1,80 @@
-node{
-     
-    stage('SCM Checkout'){
-        git url: 'https://github.com/MithunTechnologiesDevOps/java-web-app-docker.git',branch: 'master'
+pipeline {
+    agent any
+    tools {
+          maven 'maven-3.9.0' 
     }
-    
-    stage(" Maven Clean Package"){
-      def mavenHome =  tool name: "Maven-3.5.6", type: "maven"
-      def mavenCMD = "${mavenHome}/bin/mvn"
-      sh "${mavenCMD} clean package"
-      
-    } 
-    
-    
-    stage('Build Docker Image'){
-        sh 'docker build -t dockerhandson/java-web-app .'
-    }
-    
-    stage('Push Docker Image'){
-        withCredentials([string(credentialsId: 'Docker_Hub_Pwd', variable: 'Docker_Hub_Pwd')]) {
-          sh "docker login -u dockerhandson -p ${Docker_Hub_Pwd}"
+    stages {
+        stage('check out'){
+            steps {
+                git 'https://github.com/govardhan992/java-web-app-docker.git'
+            }
         }
-        sh 'docker push dockerhandson/java-web-app'
+        stage('build'){
+            steps {
+                sh "mvn clean package"
+            }
+        }
+        stage('SonarQube Analysis'){
+            steps{
+                   withSonarQubeEnv('Sonarqube-8. 9.2') {
+                        sh 'mvn clean verify sonar:sonar \
+                        -Dsonar.projectKey=maven \
+                        -Dsonar.host.url=http://18.116.32.221:9000   \
+                        -Dsonar.login=c8c9d5325de5d8eb33d201d9e1f572f3163324d8'
+                    }
+            }
+        }
+       /* stage("Quality Gate") {
+            steps {
+                timeout(time: 4, unit: 'MINUTES') {
+                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                    // true = set pipeline to UNSTABLE, false = don't
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        } */
+        stage('build the docker image'){
+            steps {
+                sh "docker build -t govardhanr992/javaapp:${BUILD_NUMBER} ."
+            }
+        }
+        stage("push docker image"){
+            steps {
+                withCredentials([string(credentialsId: 'Dockerhub_pwd', variable: 'Dockerhub_pwd')]) {
+                
+               sh "docker login -u govardhanr992 -p ${Dockerhub_pwd}"
      }
-     
-      stage('Run Docker Image In Dev Server'){
-        
-        def dockerRun = ' docker run  -d -p 8080:8080 --name java-web-app dockerhandson/java-web-app'
-         
-         sshagent(['DOCKER_SERVER']) {
-          sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.20.72 docker stop java-web-app || true'
-          sh 'ssh  ubuntu@172.31.20.72 docker rm java-web-app || true'
-          sh 'ssh  ubuntu@172.31.20.72 docker rmi -f  $(docker images -q) || true'
-          sh "ssh  ubuntu@172.31.20.72 ${dockerRun}"
-       }
-       
+                sh "docker push govardhanr992/javaapp:${BUILD_NUMBER}"
+            }
+        }
+        stage("deploy_app"){
+            steps {
+              script {
+
+                 def USER_INPUT = input(
+                    message: 'User input required - Do you want to proceed?',
+                    parameters: [
+                            [$class: 'ChoiceParameterDefinition',
+                             choices: ['no','yes'].join('\n'),
+                             name: 'input',
+                             description: 'Menu - select box option']
+                    ])
+                    echo "The answer is: ${USER_INPUT}"
+                    if( "${USER_INPUT}" == "yes"){
+                sshagent(['deploy_container']) {
+                 
+                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.27.31 docker pull govardhanr992/javaapp:${BUILD_NUMBER}'
+                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.27.31 docker rm -f webserver || true'
+                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.27.31 docker run -d -p 8080:8080 --name webserver govardhanr992/webserver:${BUILD_NUMBER}'
+                }
+                   
+            }
+                else {
+                   echo "Skipping deployment"
+                }
+         }
+            }
+        }
     }
-     
-     
-}
+    }
+
