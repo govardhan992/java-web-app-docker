@@ -54,9 +54,9 @@ pipeline {
                  
                  sshagent(['deploy_app']) {
                  
-                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@10.0.1.24 docker pull govardhanr992/java-web:${BUILD_NUMBER}'
-                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@10.0.1.24 docker rm -f webserver || true'
-                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@10.0.1.24 docker run -d -p 8080:8080 --name webserver govardhanr992/java-web:${BUILD_NUMBER}'               
+                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.27.31 docker pull govardhanr992/java-web:${BUILD_NUMBER}'
+                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.27.31 docker rm -f webserver || true'
+                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.27.31 docker run -d -p 8080:8080 --name webserver govardhanr992/java-web:${BUILD_NUMBER}'               
             }
                 
          }
