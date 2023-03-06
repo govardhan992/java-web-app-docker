@@ -58,9 +58,9 @@ pipeline {
                  sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.6.197 docker run -d -p 8080:8080 --name webserver govardhanr992/java-web:${BUILD_NUMBER}'               
             }
                 
-         }
-            }
-        }
-    }
-    }
+              }
+                }
+                 }
+                  }
+                   }
 
