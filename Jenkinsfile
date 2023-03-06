@@ -52,7 +52,7 @@ pipeline {
               script {
 
                  
-                 sshagent(['deploy_app']) {
+                 sshagent(['deploy_applicaton']) {
                  
                  sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.27.31 docker pull govardhanr992/java-web:${BUILD_NUMBER}'
                  sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.27.31 docker rm -f webserver || true'
