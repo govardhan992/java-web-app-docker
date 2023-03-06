@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Maven + sonarqube + webapp </title>
+<title>Maven + Spring MVC + Jenkins + Docker Example </title>
 
 <spring:url value="/resources/core/css/hello.css" var="coreCss" />
 <spring:url value="/resources/core/css/bootstrap.min.css" var="bootstrapCss" />
@@ -40,7 +40,7 @@
 
 	<div class="row">
 		<div class="col-md-8">
-			<h2>Welcome To Bosch, Bengaluru,Karnataka.</h2>
+			<h2>Welcome To Bosch, Bengaluru.</h2>
 			<h3></h3>
 		</div>	
 	</div>
