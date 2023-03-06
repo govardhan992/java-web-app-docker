@@ -18,9 +18,9 @@ pipeline {
             steps{
                    withSonarQubeEnv('sonarqubeserver') {
                         sh 'mvn clean verify sonar:sonar \
-                        -Dsonar.projectKey=java-maven-project \
-                        -Dsonar.host.url=http://3.14.248.244:9000 \
-                        -Dsonar.login=f0f4111502e20e4bc0d9fb8a83777d9c54fc1333'
+                        -Dsonar.projectKey=maven-project \
+                        -Dsonar.host.url=http://3.15.200.226:9000 \
+                        -Dsonar.login=e28ee201bc6eb9b3ebefdab3076ee65b384b45ee'
                     }
             }
         }
@@ -51,27 +51,14 @@ pipeline {
             steps {
               script {
 
-                 def USER_INPUT = input(
-                    message: 'User input required - Do you want to proceed?',
-                    parameters: [
-                            [$class: 'ChoiceParameterDefinition',
-                             choices: ['no','yes'].join('\n'),
-                             name: 'input',
-                             description: 'Menu - select box option']
-                    ])
-                    echo "The answer is: ${USER_INPUT}"
-                    if( "${USER_INPUT}" == "yes"){
-                sshagent(['deploy_app']) {
+                 
+                 sshagent(['deploy_app']) {
                  
                  sh 'ssh -o StrictHostKeyChecking=no ec2-user@10.0.1.24 docker pull govardhanr992/java-web:${BUILD_NUMBER}'
                  sh 'ssh -o StrictHostKeyChecking=no ec2-user@10.0.1.24 docker rm -f webserver || true'
-                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@10.0.1.24 docker run -d -p 8080:8080 --name webserver govardhanr992/java-web:${BUILD_NUMBER}'
-                }
-                   
+                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@10.0.1.24 docker run -d -p 8080:8080 --name webserver govardhanr992/java-web:${BUILD_NUMBER}'               
             }
-                else {
-                   echo "Skipping deployment"
-                }
+                
          }
             }
         }
