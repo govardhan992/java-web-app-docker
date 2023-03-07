@@ -18,9 +18,9 @@ pipeline {
             steps{
                    withSonarQubeEnv('sonarqubeserver') {
                         sh 'mvn clean verify sonar:sonar \
-                        -Dsonar.projectKey=maven-project \
-                        -Dsonar.host.url=http://3.15.200.226:9000 \
-                        -Dsonar.login=e28ee201bc6eb9b3ebefdab3076ee65b384b45ee'
+                        -Dsonar.projectKey=maven \
+                        -Dsonar.host.url=http://54.172.72.238:9000 \
+                        -Dsonar.login=1b52a17114761a2ecb2986b3bd52c95006cc5c66'
                     }
             }
         }
@@ -35,7 +35,7 @@ pipeline {
         } 
         stage('build the docker image'){
             steps {
-                sh "docker build -t govardhanr992/java-web:${BUILD_NUMBER} ."
+                sh "docker build -t govardhanr992/java-web-app:${BUILD_NUMBER} ."
             }
         }
         stage("push docker image"){
@@ -44,7 +44,7 @@ pipeline {
                 
                sh "docker login -u govardhanr992 -p ${docker_hub_pwd}"
      }
-                sh "docker push govardhanr992/java-web:${BUILD_NUMBER}"
+                sh "docker push govardhanr992/java-web-app:${BUILD_NUMBER}"
             }
         }
         stage("deploy_app"){
@@ -53,9 +53,9 @@ pipeline {
 
                  
                  sshagent(['deploy_application']) {
-                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.6.197 docker pull govardhanr992/java-web:${BUILD_NUMBER} '
+                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.6.197 docker pull govardhanr992/java-web-app:${BUILD_NUMBER} '
                  sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.6.197 docker rm -f webserver || true'
-                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.6.197 docker run -d -p 8080:8080 --name webserver govardhanr992/java-web:${BUILD_NUMBER}'               
+                 sh 'ssh -o StrictHostKeyChecking=no ec2-user@172.31.6.197 docker run -d -p 8080:8080 --name webserver govardhanr992/java-web-app:${BUILD_NUMBER}'               
             }
                 
               }
