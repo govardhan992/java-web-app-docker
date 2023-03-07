@@ -40,7 +40,7 @@
 
 	<div class="row">
 		<div class="col-md-8">
-			<h2>Welcome To Bosch, Bengaluru.</h2>
+			<h2>Welcome To Bosch</h2>
 			<h3></h3>
 		</div>	
 	</div>
