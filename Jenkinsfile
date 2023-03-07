@@ -12,7 +12,7 @@ pipeline {
         stage('SonarQube Analysis'){
             steps{
                    withSonarQubeEnv('sonarqubeserver') {
-                        sh 'mvn clean verify sonar:sonar \
+                        sh 'mvn sonar:sonar \
                         -Dsonar.projectKey=maven-project \
                         -Dsonar.host.url=http://54.172.72.238:9000 \
                         -Dsonar.login=df83deef15b6a4fbf19dbcebfc93ccc89242a890'
