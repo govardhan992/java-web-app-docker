@@ -9,11 +9,6 @@ pipeline {
                 git 'https://github.com/govardhan992/java-web-app-docker.git'
             }
         }
-        stage('build'){
-            steps {
-                sh "mvn clean package"
-            }
-        }
         stage('SonarQube Analysis'){
             steps{
                    withSonarQubeEnv('sonarqubeserver') {
@@ -24,6 +19,12 @@ pipeline {
                     }
             }
         }
+        stage('build'){
+            steps {
+                sh "mvn clean package"
+            }
+        }
+        
         stage("Quality Gate") {
             steps {
                 timeout(time: 4, unit: 'MINUTES') {
