@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+     tools {
+          maven 'maven 3.9.0' 
+    }
+    stages {
+        stage('check out'){
+            steps {
+                git 'https://github.com/govardhan992/java-web-app-docker.git'
+            }
+        }
+        stage('build'){
+            steps {
+                sh "mvn clean package"
+            }
+        }
+         stage('build the docker image'){
+            steps {
+                sh "docker build -t govardhanr992/dockerswarm:${BUILD_NUMBER} ."
+            }
+        }
+        stage("push docker image"){
+            steps {
+               withCredentials([string(credentialsId: 'docker_hub_pwd', variable: 'docker_hub_pwd')]) {
+                
+               sh "docker login -u govardhanr992 -p ${docker_hub_pwd}"
+     }
+                sh "docker push govardhanr992/dockerswarm:${BUILD_NUMBER}"
+            }
+        }
+        stage('docker swarm setup'){
+            steps {
+                script {
+                    sshagent(['docker_swarm']) {
+                     sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.11.106 docker service rm javawebapp || true'
+                     sh "ssh -o StrictHostKeyChecking=no ubuntu@172.31.11.106 docker service create --name javawebapp -p 8080:8080 --replicas 2 govardhanr992/dockerswarm:${BUILD_NUMBER}"
+                  }
+                }
+            }
+        }
+     }
+    }
